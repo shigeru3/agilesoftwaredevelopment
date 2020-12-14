@@ -1,7 +1,7 @@
 import junit.framework.TestCase;
 
 public class TestPrimeGenerator extends TestCase {
-	public static void main(String args[]) {
+	public static void main(String[] args) {
 		junit.swingui.TestRunner.main(
 				new String[] {"TestGeneratePrimes"}
 		);
@@ -24,5 +24,23 @@ public class TestPrimeGenerator extends TestCase {
 		int[] centArray = PrimeGenerator.generatePrimes(100);
 		assertEquals(centArray.length, 25);
 		assertEquals(centArray[24], 97);
+	}
+
+	public void testExhaustive() {
+		for (int i = 2; i < 500; i++) {
+			verifyPrimeList(PrimeGenerator.generatePrimes(i));
+		}
+	}
+
+	private void verifyPrimeList(int[] list) {
+		for (int j : list) {
+			verifyPrime(j);
+		}
+	}
+
+	private void verifyPrime(int n) {
+		for (int factor = 2; factor < n; factor++) {
+			assertTrue(n % factor != 0);
+		}
 	}
 }

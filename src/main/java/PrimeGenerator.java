@@ -1,58 +1,65 @@
 public class PrimeGenerator {
-	private static int s;
-	private static boolean[] f;
-	private static int[] primes;
+	private static boolean[] crossedOut;
+	private static int[] result;
 
 	public static int[] generatePrimes(int maxValue) {
 		if (maxValue < 2) {
 			return new int[0];
 		} else {
-			initializeSieve(maxValue);
-			sieve();
-			loadPrimes();
-			return primes;
+			uncrossIntegerUpTo(maxValue);
+			crossOutMultiples();
+			putUncrossedIntegersIntoResult();
+			return result;
 		}
 	}
 
-	private static void loadPrimes() {
-		int i;
-		int j;
+	private static void putUncrossedIntegersIntoResult() {
+		result = new int[numberOfUncrossedIntegers()];
+		for (int j = 0, i = 2; i < crossedOut.length; i++) {
+			if (notCrossed(i)) {
+				result[j++] = i;
+			}
+		}
+	}
 
+	private static int numberOfUncrossedIntegers() {
 		int count = 0;
-		for (i = 0; i < s; i++) {
-			if (f[i]) {
+		for (int i = 2; i < crossedOut.length; i++) {
+			if (notCrossed(i)) {
 				count++;
 			}
 		}
-		primes = new int[count];
+		return count;
+	}
 
-		for (i = 0, j = 0; i < s; i++) {
-			if (f[i]) {
-				primes[j++] = i;
+	private static void crossOutMultiples() {
+		int limit = determineIterationLimit();
+		for (int i = 2; i <= limit; i++) {
+			if (notCrossed(i)) {
+				crossOutMultiplesOf(i);
 			}
 		}
 	}
 
-	private static void sieve() {
-		int i;
-		int j;
-		for (i = 2; i < Math.sqrt(s) + 1; i++) {
-			if (f[i]) {
-				for (j = 2 * i; j < s; j += i)
-					f[j] = false;
-			}
+	private static void crossOutMultiplesOf(int i) {
+		for (int multiple = 2 * i; multiple < crossedOut.length; multiple += i) {
+			crossedOut[multiple] = true;
 		}
 	}
 
-	private static void initializeSieve(int maxValue) {
-		s = maxValue + 1;
-		f = new boolean[s];
-		int i;
+	private static boolean notCrossed(int i) {
+		return !crossedOut[i];
+	}
 
-		for (i = 0; i < s; i++) {
-			f[i] = true;
+	private static int determineIterationLimit() {
+		double iterationLimit = Math.sqrt(crossedOut.length);
+		return (int) iterationLimit;
+	}
+
+	private static void uncrossIntegerUpTo(int maxValue) {
+		crossedOut = new boolean[maxValue + 1];
+		for (int i = 2; i < crossedOut.length; i++) {
+			crossedOut[i] = false;
 		}
-
-		f[0] = f[1] = false;
 	}
 }
