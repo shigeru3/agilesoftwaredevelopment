@@ -1,3 +1,5 @@
+package primenumber;
+
 public class PrimeGenerator {
 	private static boolean[] crossedOut;
 	private static int[] result;

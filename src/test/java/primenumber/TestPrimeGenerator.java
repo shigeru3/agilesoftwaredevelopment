@@ -1,4 +1,7 @@
+package primenumber;
+
 import junit.framework.TestCase;
+import primenumber.PrimeGenerator;
 
 public class TestPrimeGenerator extends TestCase {
 	public static void main(String[] args) {
