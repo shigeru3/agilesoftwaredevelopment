@@ -99,4 +99,22 @@ public class TestPayroll extends TestCase {
 		assertNotNull(tc);
 		assertEquals(8.0, tc.GetHours());
 	}
+
+	public void testSalesReceiptTransaction() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Tim", "New York", 500.00, 2.0);
+		t.Execute();
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(20201225, 100, empId);
+		srt.Execute();
+
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentClassification pc = e.GetClassification();
+		CommissionedClassification cc = (CommissionedClassification) pc;
+		assertNotNull(cc);
+
+		SalesReceipt sr = cc.GetSalesReceipt(20201225);
+		assertNotNull(sr);
+		assertEquals(100, sr.GetAmount());
+	}
 }
