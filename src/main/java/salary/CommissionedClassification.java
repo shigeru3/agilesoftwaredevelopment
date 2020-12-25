@@ -1,9 +1,9 @@
 package salary;
 
-public class SalariedClassification extends PaymentClassification {
+public class CommissionedClassification extends PaymentClassification {
 	private double itsSalary;
 
-	public SalariedClassification(double salary) {
+	public CommissionedClassification(double salary) {
 		itsSalary = salary;
 	}
 
