@@ -117,4 +117,23 @@ public class TestPayroll extends TestCase {
 		assertNotNull(sr);
 		assertEquals(100, sr.GetAmount());
 	}
+
+	public void testAddServiceCharge() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		TimeCardTransaction tct = new TimeCardTransaction(20011031, 8.0, empId);
+		tct.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+
+		Affiliation af = new UnionAffiliation(12.5);
+		e.SetAffiliation(af);
+		int memberId = 86;
+		PayrollDatabase.AddUnionMember(memberId, e);
+		ServiceChargeTransaction sct = new ServiceChargeTransaction(memberId, 20011031, 12.95);
+		sct.Execute();
+		double sc = af.GetServiceCharge(20011031);
+		assertEquals(12.95, sc, .001);
+	}
 }
