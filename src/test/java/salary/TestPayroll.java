@@ -2,6 +2,9 @@ package salary;
 
 import junit.framework.TestCase;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
 public class TestPayroll extends TestCase {
 	public void testAddSalariedEmployee() {
 		int empId = 1;
@@ -275,5 +278,30 @@ public class TestPayroll extends TestCase {
 		Employee member = PayrollDatabase.GetUnionMember(memberId);
 		assertNotNull(member);
 		assertEquals(e, member);
+	}
+
+	public void testPaySingleSalariedEmployee() {
+		int empId = 1;
+		AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.0);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 30);
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 1000.0);
+	}
+
+	private void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double salary) {
+
+	}
+
+	public void testPaySingleSalariedEmployeeOnWrongDate() {
+		int empId = 1;
+		AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 29);
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNull(pc);
 	}
 }

@@ -20,6 +20,11 @@ public class UnionAffiliation implements Affiliation {
 		itsAmount = amount;
 	}
 
+	@Override
+	public double CalculateDeductions(Paycheck pc) {
+		return 0;
+	}
+
 	public double GetDues() {
 		return itsAmount;
 	}

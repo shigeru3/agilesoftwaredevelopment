@@ -1,12 +1,14 @@
 package salary;
 
+import java.util.Calendar;
+
 public class Employee {
 	private int itsEmpId;
 	private String itsName;
 	private String itsAddress;
-	private PaymentClassification paymentClassification;
-	private PaymentSchedule paymentSchedule;
-	private PaymentMethod paymentMethod;
+	private PaymentClassification itsClassification;
+	private PaymentSchedule itsPaymentSchedule;
+	private PaymentMethod itsPaymentMethod;
 	private Affiliation itsAffiliation;
 
 	public Employee(int empId, String name, String address) {
@@ -20,27 +22,27 @@ public class Employee {
 	}
 
 	public PaymentClassification GetClassification() {
-		return paymentClassification;
+		return itsClassification;
 	}
 
 	public PaymentSchedule GetSchedule() {
-		return paymentSchedule;
+		return itsPaymentSchedule;
 	}
 
 	public PaymentMethod GetMethod() {
-		return paymentMethod;
+		return itsPaymentMethod;
 	}
 
 	public void SetClassification(PaymentClassification pc) {
-		paymentClassification = pc;
+		itsClassification = pc;
 	}
 
 	public void SetSchedule(PaymentSchedule ps) {
-		paymentSchedule = ps;
+		itsPaymentSchedule = ps;
 	}
 
 	public void SetMethod(PaymentMethod pm) {
-		paymentMethod = pm;
+		itsPaymentMethod = pm;
 	}
 
 	public void SetAffiliation(Affiliation af) {
@@ -61,5 +63,23 @@ public class Employee {
 
 	public String GetAddress() {
 		return itsAddress;
+	}
+
+	public void Payday(Paycheck pc) {
+		double grossPay = itsClassification.CalculatePay(pc);
+		double deductions = itsAffiliation.CalculateDeductions(pc);
+		double netPay = grossPay - deductions;
+		pc.SetGrossPay(grossPay);
+		pc.SetDeductions(deductions);
+		pc.SetNetPay(netPay);
+		itsPaymentMethod.Pay(pc);
+	}
+
+	public boolean IsPayDate(Calendar payDate) {
+		return itsPaymentSchedule.IsPayDate(payDate);
+	}
+
+	public Calendar GetPayPeriodStartDate(Calendar payDate) {
+		return null;
 	}
 }

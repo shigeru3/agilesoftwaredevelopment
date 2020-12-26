@@ -1,6 +1,8 @@
 package salary;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class PayrollDatabase {
@@ -33,5 +35,9 @@ class PayrollDatabase {
 
 	public static void RemoveUnionMember(int memberId) {
 
+	}
+
+	public static List<Integer> GetAllEmployeeIds() {
+		return new ArrayList<>(itsEmployee.keySet());
 	}
 }

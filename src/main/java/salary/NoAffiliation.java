@@ -10,4 +10,9 @@ public class NoAffiliation implements Affiliation {
 	public void AddServiceCharge(long date, double amount) {
 
 	}
+
+	@Override
+	public double CalculateDeductions(Paycheck pc) {
+		return 0;
+	}
 }

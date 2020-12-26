@@ -16,9 +16,11 @@ public abstract class AddEmployeeTransaction implements Transaction {
 		PaymentSchedule ps = GetSchedule();
 		PaymentMethod pm = new HoldMethod(itsAddress);
 		Employee e = new Employee(itsEmpId, itsName, itsAddress);
+		Affiliation af = new NoAffiliation();
 		e.SetClassification(pc);
 		e.SetSchedule(ps);
 		e.SetMethod(pm);
+		e.SetAffiliation(af);
 		PayrollDatabase.AddEmployee(itsEmpId, e);
 	}
 
