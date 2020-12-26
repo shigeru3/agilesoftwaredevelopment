@@ -80,6 +80,6 @@ public class Employee {
 	}
 
 	public Calendar GetPayPeriodStartDate(Calendar payDate) {
-		return null;
+		return itsPaymentSchedule.GetPayPeriodStartDate(payDate);
 	}
 }

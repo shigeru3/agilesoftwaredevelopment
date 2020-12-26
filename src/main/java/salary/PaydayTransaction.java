@@ -26,4 +26,5 @@ public class PaydayTransaction implements Transaction {
 	public Paycheck GetPaycheck(int empId) {
 		return itsPaychecks.getOrDefault(empId, null);
 	}
+
 }

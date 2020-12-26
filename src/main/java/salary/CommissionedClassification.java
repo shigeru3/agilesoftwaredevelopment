@@ -1,6 +1,6 @@
 package salary;
 
-public class CommissionedClassification extends PaymentClassification {
+public class CommissionedClassification implements PaymentClassification {
 	private double itsSalary;
 	private SalesReceipt itsSalesReceipt;
 
@@ -18,5 +18,10 @@ public class CommissionedClassification extends PaymentClassification {
 
 	public SalesReceipt GetSalesReceipt(long date) {
 		return itsSalesReceipt;
+	}
+
+	@Override
+	public double CalculatePay(Paycheck pc) {
+		return itsSalary;
 	}
 }

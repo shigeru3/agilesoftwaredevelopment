@@ -89,7 +89,7 @@ public class TestPayroll extends TestCase {
 		int empId = 2;
 		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
 		t.Execute();
-		TimeCardTransaction tct = new TimeCardTransaction(20011031, 8.0, empId);
+		TimeCardTransaction tct = new TimeCardTransaction(new GregorianCalendar(2001, Calendar.OCTOBER, 31), 8.0, empId);
 		tct.Execute();
 
 		Employee e = PayrollDatabase.GetEmployee(empId);
@@ -98,7 +98,7 @@ public class TestPayroll extends TestCase {
 		HourlyClassification hc = (HourlyClassification) pc;
 		assertNotNull(hc);
 
-		TimeCard tc = hc.GetTimeCard(20011031);
+		TimeCard tc = hc.GetTimeCard(new GregorianCalendar(2001, Calendar.OCTOBER, 31));
 		assertNotNull(tc);
 		assertEquals(8.0, tc.GetHours());
 	}
@@ -125,7 +125,7 @@ public class TestPayroll extends TestCase {
 		int empId = 2;
 		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
 		t.Execute();
-		TimeCardTransaction tct = new TimeCardTransaction(20011031, 8.0, empId);
+		TimeCardTransaction tct = new TimeCardTransaction(new GregorianCalendar(2001, Calendar.OCTOBER, 31), 8.0, empId);
 		tct.Execute();
 		Employee e = PayrollDatabase.GetEmployee(empId);
 		assertNotNull(e);
@@ -290,10 +290,6 @@ public class TestPayroll extends TestCase {
 		ValidatePaycheck(pt, empId, payDate, 1000.0);
 	}
 
-	private void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double salary) {
-
-	}
-
 	public void testPaySingleSalariedEmployeeOnWrongDate() {
 		int empId = 1;
 		AddSalariedEmployee t = new AddSalariedEmployee(empId, "Bob", "Home", 1000.00);
@@ -303,5 +299,91 @@ public class TestPayroll extends TestCase {
 		pt.Execute();
 		Paycheck pc = pt.GetPaycheck(empId);
 		assertNull(pc);
+	}
+
+	public void testPaySingleHourlyEmployeeNoTimeCards() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 0.0);
+	}
+
+	public void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double pay) {
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNotNull(pc);
+		assertEquals(pc.GetPayPeriodEndDate(), payDate);
+		assertEquals(pay, pc.GetGrossPay());
+		assertEquals("Hold", pc.GetField("Disposition"));
+		assertEquals(0.0, pc.GetDeductions());
+		assertEquals(pay, pc.GetNetPay());
+	}
+
+	public void testPaySingleHourlyEmployeeOneTimeCard() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		TimeCardTransaction tc = new TimeCardTransaction(payDate, 2.0, empId);
+		tc.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 30.5);
+	}
+
+	public void testPaySingleHourlyEmployeeOvertimeOneTimeCard() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		TimeCardTransaction tc = new TimeCardTransaction(payDate, 9.0, empId);
+		tc.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, (8 + 1.5) * 15.25);
+	}
+
+	public void testPaySingleHourlyEmployeeOnWrongDate() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 8);
+		TimeCardTransaction tc = new TimeCardTransaction(payDate, 9.0, empId);
+		tc.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNull(pc);
+	}
+
+	public void testPaySingleHourlyEmployeeTwoCards() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		TimeCardTransaction tc = new TimeCardTransaction(payDate, 2.0, empId);
+		tc.Execute();
+		TimeCardTransaction tc2 = new TimeCardTransaction(new GregorianCalendar(2001, Calendar.NOVEMBER, 8), 5.0, empId);
+		tc2.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 7 * 15.25);
+	}
+
+	public void testPaySingleHourlyEmployeeWithTimeCardsSpanningTwoPayPeriods() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		Calendar dateInPreviousPayPeriod = new GregorianCalendar(2001, Calendar.NOVEMBER, 2);
+		TimeCardTransaction tc = new TimeCardTransaction(payDate, 2.0, empId);
+		tc.Execute();
+		TimeCardTransaction tc2 = new TimeCardTransaction(dateInPreviousPayPeriod, 5.0, empId);
+		tc2.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 2 * 15.25);
 	}
 }

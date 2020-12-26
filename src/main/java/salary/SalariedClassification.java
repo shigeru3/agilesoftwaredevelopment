@@ -1,6 +1,6 @@
 package salary;
 
-public class SalariedClassification extends PaymentClassification {
+public class SalariedClassification implements PaymentClassification {
 	private double itsSalary;
 
 	public SalariedClassification(double salary) {
@@ -8,6 +8,11 @@ public class SalariedClassification extends PaymentClassification {
 	}
 
 	public double GetSalary() {
+		return itsSalary;
+	}
+
+	@Override
+	public double CalculatePay(Paycheck pc) {
 		return itsSalary;
 	}
 }
