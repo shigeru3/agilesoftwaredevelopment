@@ -1,9 +1,9 @@
 package salary;
 
-public class HoldMethod extends PaymentMethod {
+public class MailMethod extends PaymentMethod {
 	private String itsAddress;
 
-	public HoldMethod(String address) {
+	public MailMethod(String address) {
 		itsAddress = address;
 	}
 

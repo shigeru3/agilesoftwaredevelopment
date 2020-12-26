@@ -55,7 +55,7 @@ public class Employee {
 		itsName = name;
 	}
 
-	public void setAddress(String address) {
+	public void SetAddress(String address) {
 		itsAddress = address;
 	}
 

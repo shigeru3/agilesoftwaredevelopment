@@ -14,7 +14,7 @@ public abstract class AddEmployeeTransaction implements Transaction {
 	public void Execute() {
 		PaymentClassification pc = GetClassification();
 		PaymentSchedule ps = GetSchedule();
-		PaymentMethod pm = new HoldMethod();
+		PaymentMethod pm = new HoldMethod(itsAddress);
 		Employee e = new Employee(itsEmpId, itsName, itsAddress);
 		e.SetClassification(pc);
 		e.SetSchedule(ps);

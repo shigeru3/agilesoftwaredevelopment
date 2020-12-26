@@ -9,7 +9,7 @@ public class ChangeAddressTransaction extends ChangeEmployeeTransaction {
 	}
 
 	void Change(Employee e) {
-		e.setAddress(itsAddress);
+		e.SetAddress(itsAddress);
 
 	}
 }

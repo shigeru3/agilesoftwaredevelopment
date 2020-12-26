@@ -195,7 +195,7 @@ public class TestPayroll extends TestCase {
 		assertNotNull(ms);
 	}
 
-	public void testCommissionedTransaction() {
+	public void testChangeCommissionedTransaction() {
 		int empId = 5;
 		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Simon", "England", 15.00);
 		t.Execute();
@@ -211,5 +211,50 @@ public class TestPayroll extends TestCase {
 		PaymentSchedule ps = e.GetSchedule();
 		BiweeklySchedule bs = (BiweeklySchedule) ps;
 		assertNotNull(bs);
+	}
+
+	public void testChangeDirectMethodTransaction() {
+		int empId = 6;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "John", "SFA", 16.00);
+		t.Execute();
+		ChangeDirectTransaction cdt = new ChangeDirectTransaction(empId, "Swiss", "John");
+		cdt.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentMethod pm = e.GetMethod();
+		assertNotNull(pm);
+		DirectMethod dm = (DirectMethod) pm;
+		assertNotNull(dm);
+		assertEquals("Swiss", dm.GetBank());
+	}
+
+	public void testChangeMailMethodTransaction() {
+		int empId = 6;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "John", "SFA", 16.00);
+		t.Execute();
+		ChangeMailTransaction cmt = new ChangeMailTransaction(empId, "Swiss");
+		cmt.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentMethod pm = e.GetMethod();
+		assertNotNull(pm);
+		MailMethod mm = (MailMethod) pm;
+		assertNotNull(mm);
+		assertEquals("Swiss", mm.GetAddress());
+	}
+
+	public void testHoldTransaction() {
+		int empId = 6;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "John", "Swiss", 17.00);
+		t.Execute();
+		ChangeHoldTransaction cht = new ChangeHoldTransaction(empId, "Swiss");
+		cht.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentMethod pm = e.GetMethod();
+		assertNotNull(pm);
+		HoldMethod hm = (HoldMethod) pm;
+		assertNotNull(hm);
+		assertEquals("Swiss", hm.GetAddress());
 	}
 }
