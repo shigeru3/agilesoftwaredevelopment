@@ -127,9 +127,9 @@ public class TestPayroll extends TestCase {
 		Employee e = PayrollDatabase.GetEmployee(empId);
 		assertNotNull(e);
 
-		Affiliation af = new UnionAffiliation(12.5);
-		e.SetAffiliation(af);
 		int memberId = 86;
+		Affiliation af = new UnionAffiliation(memberId, 12.5);
+		e.SetAffiliation(af);
 		PayrollDatabase.AddUnionMember(memberId, e);
 		ServiceChargeTransaction sct = new ServiceChargeTransaction(memberId, 20011031, 12.95);
 		sct.Execute();
@@ -256,5 +256,24 @@ public class TestPayroll extends TestCase {
 		HoldMethod hm = (HoldMethod) pm;
 		assertNotNull(hm);
 		assertEquals("Swiss", hm.GetAddress());
+	}
+
+	public void testChangeMemberTransaction() {
+		int empId = 2;
+		int memberId = 7734;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		ChangeMemberTransaction cmt = new ChangeMemberTransaction(empId, memberId, 99.42);
+		cmt.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		Affiliation af = e.GetAffiliation();
+		assertNotNull(af);
+		UnionAffiliation uf = (UnionAffiliation) af;
+		assertNotNull(uf);
+		assertEquals(99.42, uf.GetDues());
+		Employee member = PayrollDatabase.GetUnionMember(memberId);
+		assertNotNull(member);
+		assertEquals(e, member);
 	}
 }

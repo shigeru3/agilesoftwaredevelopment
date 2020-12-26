@@ -4,6 +4,7 @@ public class ServiceChargeTransaction implements Transaction {
 	private int itsMemberId;
 	private long itsDate;
 	private double itsAmount;
+	private double itsDues;
 
 	public ServiceChargeTransaction(int memberId, long date, double amount) {
 		itsMemberId = memberId;

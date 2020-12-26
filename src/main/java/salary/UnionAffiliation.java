@@ -1,10 +1,12 @@
 package salary;
 
 public class UnionAffiliation implements Affiliation {
+	private int itsMemberId;
 	private long itsDate;
 	private double itsAmount;
 
-	public UnionAffiliation(double amount) {
+	public UnionAffiliation(int memberId, double amount) {
+		itsMemberId = memberId;
 		itsAmount = amount;
 	}
 
@@ -12,8 +14,17 @@ public class UnionAffiliation implements Affiliation {
 		return itsAmount;
 	}
 
+	@Override
 	public void AddServiceCharge(long date, double amount) {
 		itsDate = date;
 		itsAmount = amount;
+	}
+
+	public double GetDues() {
+		return itsAmount;
+	}
+
+	public int GetMemberId() {
+		return itsMemberId;
 	}
 }
