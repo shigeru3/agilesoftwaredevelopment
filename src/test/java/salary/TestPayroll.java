@@ -136,4 +136,26 @@ public class TestPayroll extends TestCase {
 		double sc = af.GetServiceCharge(20011031);
 		assertEquals(12.95, sc, .001);
 	}
+
+	public void testChangeNameTransaction() {
+		int empId = 2;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
+		t.Execute();
+		ChangeNameTransaction cnt = new ChangeNameTransaction(empId, "Bob");
+		cnt.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		assertEquals("Bob", e.GetName());
+	}
+
+	public void testChangeAddressTransaction() {
+		int empId = 3;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Andrew", "SFA", 22.13);
+		t.Execute();
+		ChangeAddressTransaction cat = new ChangeAddressTransaction(empId, "LA");
+		cat.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		assertEquals("LA", e.GetAddress());
+	}
 }

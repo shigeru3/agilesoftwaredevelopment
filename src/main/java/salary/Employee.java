@@ -50,4 +50,16 @@ public class Employee {
 	public Affiliation GetAffiliation() {
 		return itsAffiliation;
 	}
+
+	public void SetName(String name) {
+		itsName = name;
+	}
+
+	public void setAddress(String address) {
+		itsAddress = address;
+	}
+
+	public String GetAddress() {
+		return itsAddress;
+	}
 }
