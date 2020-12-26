@@ -1,15 +1,15 @@
 package salary;
 
 public class HourlyClassification extends PaymentClassification {
-	private double itsSalary;
+	private double itsRate;
 	private TimeCard itsTimeCard;
 
-	public HourlyClassification(double salary) {
-		itsSalary = salary;
+	public HourlyClassification(double rate) {
+		itsRate = rate;
 	}
 
 	public double GetSalary() {
-		return itsSalary;
+		return itsRate;
 	}
 
 	public void AddTimeCard(TimeCard timeCard) {
@@ -18,5 +18,9 @@ public class HourlyClassification extends PaymentClassification {
 
 	public TimeCard GetTimeCard(long date) {
 		return itsTimeCard;
+	}
+
+	public double GetRate() {
+		return itsRate;
 	}
 }

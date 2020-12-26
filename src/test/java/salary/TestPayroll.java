@@ -158,4 +158,58 @@ public class TestPayroll extends TestCase {
 		assertNotNull(e);
 		assertEquals("LA", e.GetAddress());
 	}
+
+	public void testChangeHourlyTransaction() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, 3.2);
+		t.Execute();
+		ChangeHourlyTransaction cht = new ChangeHourlyTransaction(empId, 27.25);
+		cht.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentClassification pc = e.GetClassification();
+		assertNotNull(pc);
+		HourlyClassification hc = (HourlyClassification) pc;
+		assertNotNull(hc);
+		assertEquals(27.25, hc.GetRate());
+		PaymentSchedule ps = e.GetSchedule();
+		WeeklySchedule ws = (WeeklySchedule) ps;
+		assertNotNull(ws);
+	}
+
+	public void testChangeSalariedTransaction() {
+		int empId = 4;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Eric", "SFA", 28.00);
+		t.Execute();
+		ChangeSalariedTransaction cst = new ChangeSalariedTransaction(empId, 2500.00);
+		cst.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentClassification pc = e.GetClassification();
+		assertNotNull(pc);
+		SalariedClassification sc = (SalariedClassification) pc;
+		assertNotNull(sc);
+		assertEquals(2500.00, sc.GetSalary());
+		PaymentSchedule ps = e.GetSchedule();
+		MonthlySchedule ms = (MonthlySchedule) ps;
+		assertNotNull(ms);
+	}
+
+	public void testCommissionedTransaction() {
+		int empId = 5;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Simon", "England", 15.00);
+		t.Execute();
+		ChangeCommissionedTransaction cct = new ChangeCommissionedTransaction(empId, 2000.00);
+		cct.Execute();
+		Employee e = PayrollDatabase.GetEmployee(empId);
+		assertNotNull(e);
+		PaymentClassification pc = e.GetClassification();
+		assertNotNull(pc);
+		CommissionedClassification cc = (CommissionedClassification) pc;
+		assertNotNull(cc);
+		assertEquals(2000.00, cc.GetSalary());
+		PaymentSchedule ps = e.GetSchedule();
+		BiweeklySchedule bs = (BiweeklySchedule) ps;
+		assertNotNull(bs);
+	}
 }

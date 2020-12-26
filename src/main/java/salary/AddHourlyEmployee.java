@@ -1,11 +1,11 @@
 package salary;
 
 public class AddHourlyEmployee extends AddEmployeeTransaction {
-	private double itsSalary;
+	private double itsRate;
 
-	public AddHourlyEmployee(int empId, String name, String address, double salary) {
+	public AddHourlyEmployee(int empId, String name, String address, double rate) {
 		super(empId, name, address);
-		itsSalary = salary;
+		itsRate = rate;
 	}
 
 	PaymentSchedule GetSchedule() {
@@ -13,7 +13,7 @@ public class AddHourlyEmployee extends AddEmployeeTransaction {
 	}
 
 	PaymentClassification GetClassification() {
-		return new HourlyClassification(itsSalary);
+		return new HourlyClassification(itsRate);
 	}
 }
 
