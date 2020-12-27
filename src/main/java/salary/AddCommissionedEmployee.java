@@ -15,6 +15,6 @@ public class AddCommissionedEmployee extends AddEmployeeTransaction {
 	}
 
 	PaymentClassification GetClassification() {
-		return new CommissionedClassification(itsSalary);
+		return new CommissionedClassification(itsSalary, itsCommissionRate);
 	}
 }

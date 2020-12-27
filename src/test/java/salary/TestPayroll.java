@@ -107,7 +107,7 @@ public class TestPayroll extends TestCase {
 		int empId = 3;
 		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Tim", "New York", 500.00, 2.0);
 		t.Execute();
-		SalesReceiptTransaction srt = new SalesReceiptTransaction(20201225, 100, empId);
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(new GregorianCalendar(2001, Calendar.NOVEMBER, 9), 100.0, empId);
 		srt.Execute();
 
 		Employee e = PayrollDatabase.GetEmployee(empId);
@@ -116,9 +116,9 @@ public class TestPayroll extends TestCase {
 		CommissionedClassification cc = (CommissionedClassification) pc;
 		assertNotNull(cc);
 
-		SalesReceipt sr = cc.GetSalesReceipt(20201225);
+		SalesReceipt sr = cc.GetSalesReceipt(new GregorianCalendar(2001, Calendar.NOVEMBER, 9));
 		assertNotNull(sr);
-		assertEquals(100, sr.GetAmount());
+		assertEquals(100.0, sr.GetAmount());
 	}
 
 	public void testAddServiceCharge() {
@@ -202,7 +202,7 @@ public class TestPayroll extends TestCase {
 		int empId = 5;
 		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Simon", "England", 15.00);
 		t.Execute();
-		ChangeCommissionedTransaction cct = new ChangeCommissionedTransaction(empId, 2000.00);
+		ChangeCommissionedTransaction cct = new ChangeCommissionedTransaction(empId, 2000.00, .25);
 		cct.Execute();
 		Employee e = PayrollDatabase.GetEmployee(empId);
 		assertNotNull(e);
@@ -311,16 +311,6 @@ public class TestPayroll extends TestCase {
 		ValidatePaycheck(pt, empId, payDate, 0.0);
 	}
 
-	public void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double pay) {
-		Paycheck pc = pt.GetPaycheck(empId);
-		assertNotNull(pc);
-		assertEquals(pc.GetPayPeriodEndDate(), payDate);
-		assertEquals(pay, pc.GetGrossPay());
-		assertEquals("Hold", pc.GetField("Disposition"));
-		assertEquals(0.0, pc.GetDeductions());
-		assertEquals(pay, pc.GetNetPay());
-	}
-
 	public void testPaySingleHourlyEmployeeOneTimeCard() {
 		int empId = 2;
 		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.25);
@@ -386,4 +376,84 @@ public class TestPayroll extends TestCase {
 		pt.Execute();
 		ValidatePaycheck(pt, empId, payDate, 2 * 15.25);
 	}
+
+	public void testPaySingleCommissionedEmployeeNoSalesReceipts() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, 3.2);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 2500.00);
+	}
+
+	public void testPaySingleCommissionedEmployeeOneSalesReceipt() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, .032);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 13000.0, empId);
+		srt.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 2500.0 + .032 * 13000);
+	}
+
+	public void testPaySingleCommissionedEmployeeTwoSalesReceipt() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, .032);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 13000.0, empId);
+		srt.Execute();
+		SalesReceiptTransaction srt2 = new SalesReceiptTransaction(new GregorianCalendar(2001, Calendar.NOVEMBER, 8), 24000, empId);
+		srt2.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 2500.0 + .032 * 13000 + .032 * 24000);
+	}
+
+	public void testPaySingleCommissionedEmployeeWrongDate() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, .032);
+		t.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 16);
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 13000, empId);
+		srt.Execute();
+		SalesReceiptTransaction srt2 = new SalesReceiptTransaction(new GregorianCalendar(2001, Calendar.NOVEMBER, 15), 24000, empId);
+		srt2.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNull(pc);
+	}
+
+	public void testPaySingleCommissionedEmployeeSpanMultiplePayPeriods() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, .032);
+		t.Execute();
+		Calendar earlyDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 23);
+		Calendar lateDate = new GregorianCalendar(2001, Calendar.DECEMBER, 7);
+		SalesReceiptTransaction srt = new SalesReceiptTransaction(payDate, 13000, empId);
+		SalesReceiptTransaction srt2 = new SalesReceiptTransaction(earlyDate, 24000, empId);
+		SalesReceiptTransaction srt3 = new SalesReceiptTransaction(lateDate, 15000, empId);
+		srt.Execute();
+		srt2.Execute();
+		srt3.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		ValidatePaycheck(pt, empId, payDate, 2500.0 + .032 * 13000);
+	}
+
+	private void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double pay) {
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNotNull(pc);
+		assertEquals(pc.GetPayPeriodEndDate(), payDate);
+		assertEquals(pay, pc.GetGrossPay());
+		assertEquals("Hold", pc.GetField("Disposition"));
+		assertEquals(0.0, pc.GetDeductions());
+		assertEquals(pay, pc.GetNetPay());
+	}
+
 }

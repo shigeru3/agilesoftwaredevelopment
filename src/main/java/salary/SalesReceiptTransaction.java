@@ -1,11 +1,13 @@
 package salary;
 
+import java.util.Calendar;
+
 public class SalesReceiptTransaction implements Transaction {
-	private long itsDate;
-	private int itsAmount;
+	private Calendar itsDate;
+	private double itsAmount;
 	private int itsEmpId;
 
-	public SalesReceiptTransaction(long date, int amount, int empId) {
+	public SalesReceiptTransaction(Calendar date, double amount, int empId) {
 		itsDate = date;
 		itsAmount = amount;
 		itsEmpId = empId;

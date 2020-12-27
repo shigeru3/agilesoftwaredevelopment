@@ -1,16 +1,21 @@
 package salary;
 
-public class SalesReceipt {
-	private long itsDate;
-	private int itsAmount;
+import java.util.Calendar;
 
-	public SalesReceipt(long date, int amount) {
+public class SalesReceipt {
+	private Calendar itsDate;
+	private double itsAmount;
+
+	public SalesReceipt(Calendar date, double amount) {
 		itsDate = date;
 		itsAmount = amount;
 	}
 
+	public Calendar GetSalesDate() {
+		return itsDate;
+	}
 
-	public int GetAmount() {
+	public double GetAmount() {
 		return itsAmount;
 	}
 }
