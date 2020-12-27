@@ -1,14 +1,11 @@
 package salary;
 
+import java.util.Calendar;
+
 public class NoAffiliation implements Affiliation {
 	@Override
-	public double GetServiceCharge(double dues) {
+	public double GetServiceCharge(Calendar dues) {
 		return 0;
-	}
-
-	@Override
-	public void AddServiceCharge(long date, double amount) {
-
 	}
 
 	@Override

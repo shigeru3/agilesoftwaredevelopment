@@ -1,9 +1,9 @@
 package salary;
 
-public interface Affiliation {
-	double GetServiceCharge(double date);
+import java.util.Calendar;
 
-	void AddServiceCharge(long date, double amount);
+public interface Affiliation {
+	double GetServiceCharge(Calendar date);
 
 	double CalculateDeductions(Paycheck pc);
 }
