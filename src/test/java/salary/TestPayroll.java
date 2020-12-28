@@ -2,6 +2,7 @@ package salary;
 
 import junit.framework.TestCase;
 
+import java.sql.Time;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -515,6 +516,46 @@ public class TestPayroll extends TestCase {
 		assertEquals("Hold", pc.GetField("Disposition"));
 		assertEquals(9.42 + 19.42, pc.GetDeductions());
 		assertEquals(8 * 15.24 - (9.42 + 19.42), pc.GetNetPay());
+	}
+
+	public void testHourlyUnionMemberDues() {
+		int empId = 1;
+		AddHourlyEmployee t = new AddHourlyEmployee(empId, "Bill", "Home", 15.24);
+		t.Execute();
+		int memberId = 7734;
+		ChangeMemberTransaction cmt = new ChangeMemberTransaction(empId, memberId, 9.42);
+		cmt.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		TimeCardTransaction tct = new TimeCardTransaction(payDate, 8.0, empId);
+		tct.Execute();
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNotNull(pc);
+		assertEquals(pc.GetPayPeriodEndDate(), payDate);
+		assertEquals(8 * 15.24, pc.GetGrossPay());
+		assertEquals("Hold", pc.GetField("Disposition"));
+		assertEquals(9.42, pc.GetDeductions());
+		assertEquals(8 * 15.24 - 9.42, pc.GetNetPay());
+	}
+
+	public void testCommissionedUnionMemberDues() {
+		int empId = 3;
+		AddCommissionedEmployee t = new AddCommissionedEmployee(empId, "Lance", "Home", 2500, .032);
+		t.Execute();
+		int memberId = 7734;
+		ChangeMemberTransaction cmt = new ChangeMemberTransaction(empId, memberId, 9.42);
+		cmt.Execute();
+		Calendar payDate = new GregorianCalendar(2001, Calendar.NOVEMBER, 9);
+		PaydayTransaction pt = new PaydayTransaction(payDate);
+		pt.Execute();
+		Paycheck pc = pt.GetPaycheck(empId);
+		assertNotNull(pc);
+		assertEquals(pc.GetPayPeriodEndDate(), payDate);
+		assertEquals(2500.0, pc.GetGrossPay());
+		assertEquals("Hold", pc.GetField("Disposition"));
+		assertEquals(2 * 9.42, pc.GetDeductions());
+		assertEquals(2500.0 - 2 * 9.42, pc.GetNetPay());
 	}
 
 	private void ValidatePaycheck(PaydayTransaction pt, int empId, Calendar payDate, double pay) {
